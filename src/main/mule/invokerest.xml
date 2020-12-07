@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a7d3800b-0d6e-4a38-927b-decdef2fd780" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="03b42493-4eb0-431d-acab-9a102f4673ee" >
+		<http:request-connection host="35.235.91.75" port="8080" >
+		</http:request-connection>
+	</http:request-config>
+	<flow name="invokerestFlow" doc:id="5c575d2f-0b20-4512-9042-7f0778f09b62" >
+		<http:listener doc:name="Listener" doc:id="a2fa3159-901a-40ec-b28c-fa3ee8f0fe65" config-ref="HTTP_Listener_config" path="/"/>
+		<http:request method="GET" doc:name="Request" doc:id="37ae137a-3f57-4fff-9fc0-6a57c6ff061d" config-ref="HTTP_Request_configuration" path="Registro_Civil/rs/usuario/datos?f=1401277767"/>
+	</flow>
+	<flow name="invokerestFlow1" doc:id="70f4c498-316f-4201-b344-a69e5c78b2be" >
+		<http:listener doc:name="Listener" doc:id="29472bdd-08b1-4699-a39b-5b594f27f23a" config-ref="HTTP_Listener_config" path="/form"/>
+		<parse-template doc:name="Parse Template" doc:id="f386b46d-1e69-484a-b27e-6ab15044938c" location="fomr.html"/>
+	</flow>
+	<flow name="invokerestFlow2" doc:id="247a9952-06ac-4c35-acf2-c485ad18e70c" >
+		<http:listener doc:name="Listener" doc:id="6964ee2a-b569-4163-99b2-bb89ef581ac7" config-ref="HTTP_Listener_config" path="/response"/>
+		<logger level="INFO" doc:name="Logger" doc:id="6f3d3d42-8049-4773-acbb-57f361c8174f" message="#[attributes.queryParams.'fname']]"/>
+		<parse-template doc:name="Parse Template" doc:id="0d7c8a1c-d633-4ba9-ab5c-b26435fbb678" location="response.html"/>
+	</flow>
+	<flow name="invokerestFlow3" doc:id="a3e2dc6d-9ca7-418f-85d5-368f54147146" >
+		<http:listener doc:name="Listener" doc:id="ab26f572-2d64-48cf-9b3f-37836e55472c" config-ref="HTTP_Listener_config" path="/web"/>
+		<http:request method="GET" doc:name="Request" doc:id="d454dd1a-aa7b-444e-aa45-e923da83f781" config-ref="HTTP_Request_configuration" path="Registro_Civil/rs/usuario/datos">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	f : attributes.queryParams.'fname'
+}]]]></http:query-params>
+		</http:request>
+		<parse-template doc:name="Parse Template" doc:id="0e763dbb-0f95-4abd-87dc-3b756ef2f0ef" location="datos.html"/>
+	</flow>
+</mule>
