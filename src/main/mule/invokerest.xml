@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+<mule xmlns:netsuite="http://www.mulesoft.org/schema/mule/netsuite"
+	xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/netsuite http://www.mulesoft.org/schema/mule/netsuite/current/mule-netsuite.xsd">
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a7d3800b-0d6e-4a38-927b-decdef2fd780" >
 		<http:listener-connection host="localhost" port="8081" />
 	</http:listener-config>
 	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="03b42493-4eb0-431d-acab-9a102f4673ee" >
 		<http:request-connection host="35.235.91.75" port="8080" >
 		</http:request-connection>
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="7f1526a6-5ce0-4223-ab6e-fa59e7fe28f7" >
+		<http:request-connection host="35.235.91.75" port="8080" />
 	</http:request-config>
 	<flow name="invokerestFlow" doc:id="5c575d2f-0b20-4512-9042-7f0778f09b62" >
 		<http:listener doc:name="Listener" doc:id="a2fa3159-901a-40ec-b28c-fa3ee8f0fe65" config-ref="HTTP_Listener_config" path="/"/>
@@ -33,6 +40,73 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 	f : attributes.queryParams.'fname'
 }]]]></http:query-params>
 		</http:request>
-		<parse-template doc:name="Parse Template" doc:id="0e763dbb-0f95-4abd-87dc-3b756ef2f0ef" location="datos.html"/>
+	</flow>
+	<flow name="invokerestFlow4" doc:id="325ab269-0fa8-4d47-8eac-7c8586a0fedc" >
+		<http:listener doc:name="Listener" doc:id="54c87e8c-3857-4666-b263-22c3103e2b9a" config-ref="HTTP_Listener_config" path="/par"/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="ae7b3716-d828-45c6-9765-67a79c1dea23" >
+			<route >
+				<http:request method="GET" doc:name="Request" doc:id="bd46cca7-bb3d-4ef0-9db5-0c1bd54cabd1" config-ref="HTTP_Request_configuration" path="Registro_Civil/rs/usuario/datos?f=1401277767"/>
+				<ee:transform doc:name="Transform Message" doc:id="ef826b9a-fe27-44b2-b73b-cfa65df23333" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	apellido: payload.apellido,
+	cedula: payload.cedula,
+	ciudad: payload.ciudad,
+	educacion: payload.educacion,
+	estado: payload.estado,
+	estado_usuario: payload.estado_usuario,
+	fecha_nacimiento: payload.fecha_nacimiento,
+	genero: payload.genero,
+	nombre: payload.nombre,
+	principal: payload.principal,
+	secundaria: payload.secundaria,
+	telefono: payload.telefono
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="034794a6-702e-4f02-92f1-01d9abe85de4" message="#[payload]"/>
+				<parse-template doc:name="Parse Template" doc:id="0e763dbb-0f95-4abd-87dc-3b756ef2f0ef" location="datos.html" />
+			</route>
+			<route >
+				<http:request method="GET" doc:name="Request" doc:id="37ce615b-3cd8-45c3-b620-0ca054a4cb7d" path="Registro_Civil/rs/usuario/datos?f=1401277767" config-ref="HTTP_Request_configuration"/>
+				<ee:transform doc:name="Transform Message" doc:id="66a02a04-63ab-4818-b517-52f24983403e" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="b3a11259-4944-4d3d-bdc6-f9fdd98cd7a6" message="Hola" />
+			</route>
+		</scatter-gather>
+	</flow>
+	<flow name="invokerestFlow5" doc:id="95a830fe-fe49-4ac3-97b9-bf618398d8f4" >
+		<http:listener doc:name="Listener" doc:id="19f6e6dc-6490-483e-9861-80bb0564bde3" config-ref="HTTP_Listener_config" path="/sca"/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="d350f05e-5bf5-4119-a5fb-41c3501f9127" >
+			<route >
+				<http:request method="GET" doc:name="Request" doc:id="2a3e6bee-cb8a-4413-abb6-88356f44d374" config-ref="HTTP_Request_configuration1" path="Registro_Civil/rs/usuario/datos?f=1401277767"/>
+			</route>
+			<route >
+				<http:request method="GET" doc:name="Request" doc:id="4bac41d2-1a6d-45d4-8535-72d4caa49a3f" config-ref="HTTP_Request_configuration1" path="Registro_Civil/rs/usuario/datos?f=0107349110"/>
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="Transform Message" doc:id="f869380c-7c2d-4fe5-9018-5806eda22371" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	post1: payload[0].payload,
+	post2: payload[1].payload.'cedula'
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="5f97e861-58a3-48c3-bb62-13ec476e60d7" message="#[payload[0]['nombre']]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="aa90b142-2533-46cc-af54-8b83455c82fe" message="#[payload.post2]"/>
 	</flow>
 </mule>

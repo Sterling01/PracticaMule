@@ -1,4 +1,80 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
-  <types:catalog/>
+  <types:catalog>
+    <types:type name="cedula" format="json">
+      <types:shape format="weave" example="examples/ejm.json"><![CDATA[%dw 2.0
+
+type cedula = {|
+  apellido: String, 
+  cedula: String, 
+  ciudad: String, 
+  educacion: String, 
+  estado: String, 
+  estado_usuario: String, 
+  fecha_nacimiento: String, 
+  genero: String, 
+  nombre: String, 
+  principal: String, 
+  secundaria: String, 
+  telefono: String
+|} {"example": "{\\\"apellido\\\":\\\"Vazquez\\\",\\\"cedula\\\":\\\"1401277767\\\",\\\"ciudad\\\":\\\"Cuenca\\\",\\\"educacion\\\":\\\"Secundario\\\",\\\"estado\\\":\\\"Divorciado\\\",\\\"estado_usuario\\\":\\\"Habilitado\\\",\\\"fecha_nacimiento\\\":\\\"1990-11-30\\\",\\\"genero\\\":\\\"Masculino\\\",\\\"nombre\\\":\\\"Javier\\\",\\\"principal\\\":\\\"Casique Duma\\\",\\\"secundaria\\\":\\\"Calle del retorno 1\\\",\\\"telefono\\\":\\\"072808388\\\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="cedula1" format="json">
+      <types:shape format="weave" example="examples/ejm.json"><![CDATA[%dw 2.0
+
+type cedula1 = {|
+  apellido: String, 
+  cedula: String, 
+  ciudad: String, 
+  educacion: String, 
+  estado: String, 
+  estado_usuario: String, 
+  fecha_nacimiento: String, 
+  genero: String, 
+  nombre: String, 
+  principal: String, 
+  secundaria: String, 
+  telefono: String
+|} {"example": "{\\\"apellido\\\":\\\"Vazquez\\\",\\\"cedula\\\":\\\"1401277767\\\",\\\"ciudad\\\":\\\"Cuenca\\\",\\\"educacion\\\":\\\"Secundario\\\",\\\"estado\\\":\\\"Divorciado\\\",\\\"estado_usuario\\\":\\\"Habilitado\\\",\\\"fecha_nacimiento\\\":\\\"1990-11-30\\\",\\\"genero\\\":\\\"Masculino\\\",\\\"nombre\\\":\\\"Javier\\\",\\\"principal\\\":\\\"Casique Duma\\\",\\\"secundaria\\\":\\\"Calle del retorno 1\\\",\\\"telefono\\\":\\\"072808388\\\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="persona2" format="json">
+      <types:shape format="weave" example="examples/persona2-1.json"><![CDATA[%dw 2.0
+
+type persona2 = {|
+  apellido: String, 
+  cedula: String, 
+  nombre: String
+|} {"example": "{\\\"apellido\\\":\\\"Vazquez\\\",\\\"cedula\\\":\\\"1401277767\\\",\\\"nombre\\\":\\\"Javier\\\"}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#ef826b9a-fe27-44b2-b73b-cfa65df23333">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="cedula"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="cedula"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#f869380c-7c2d-4fe5-9018-5806eda22371">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:variables>
+          <types:variable name="persona2" type="persona2"/>
+          <types:variable name="persona1" type="cedula"/>
+        </types:variables>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
 </types:mule>
