@@ -89,10 +89,22 @@ output application/java
 		<http:listener doc:name="Listener" doc:id="19f6e6dc-6490-483e-9861-80bb0564bde3" config-ref="HTTP_Listener_config" path="/sca"/>
 		<scatter-gather doc:name="Scatter-Gather" doc:id="d350f05e-5bf5-4119-a5fb-41c3501f9127" >
 			<route >
-				<http:request method="GET" doc:name="Request" doc:id="2a3e6bee-cb8a-4413-abb6-88356f44d374" config-ref="HTTP_Request_configuration1" path="Registro_Civil/rs/usuario/datos?f=1401277767"/>
+				<http:request method="GET" doc:name="Request" doc:id="2a3e6bee-cb8a-4413-abb6-88356f44d374" config-ref="HTTP_Request_configuration1" path="Registro_Civil/rs/usuario/datos">
+					<http:query-params ><![CDATA[#[output application/java
+---
+{
+	f : attributes.queryParams.'fname'
+}]]]></http:query-params>
+				</http:request>
 			</route>
 			<route >
-				<http:request method="GET" doc:name="Request" doc:id="4bac41d2-1a6d-45d4-8535-72d4caa49a3f" config-ref="HTTP_Request_configuration1" path="Registro_Civil/rs/usuario/datos?f=0107349110"/>
+				<http:request method="GET" doc:name="Request" doc:id="4bac41d2-1a6d-45d4-8535-72d4caa49a3f" config-ref="HTTP_Request_configuration1" path="Peliculas/rs/pelicula/datos">
+					<http:query-params ><![CDATA[#[output application/java
+---
+{
+	f : attributes.queryParams.'pname'
+}]]]></http:query-params>
+				</http:request>
 			</route>
 		</scatter-gather>
 		<ee:transform doc:name="Transform Message" doc:id="f869380c-7c2d-4fe5-9018-5806eda22371" >
@@ -101,12 +113,37 @@ output application/java
 output application/json
 ---
 {
-	post1: payload[0].payload,
-	post2: payload[1].payload.'cedula'
+	cedula: payload[0].payload.cedula,
+	nombre: payload[0].payload.nombre ++" "++ payload[0].payload.apellido,
+	telefono: payload[0].payload.telefono,
+	direccion: payload[0].payload.principal ++" "++ payload[0].payload.secundaria,
+	datos_detalle:{
+		cantidad:1,
+		titulo:payload[1].payload.titulo,
+		precio:payload[1].payload.precio
+	}
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<logger level="INFO" doc:name="Logger" doc:id="5f97e861-58a3-48c3-bb62-13ec476e60d7" message="#[payload[0]['nombre']]"/>
-		<logger level="INFO" doc:name="Logger" doc:id="aa90b142-2533-46cc-af54-8b83455c82fe" message="#[payload.post2]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="5f97e861-58a3-48c3-bb62-13ec476e60d7" message="#[payload]"/>
+		<http:request method="POST" doc:name="Request" doc:id="76dc121c-a146-494e-9853-0218d8e857dd" config-ref="HTTP_Request_configuration1" path="Facturacion/rs/facturacion/guardarFacturas" />
+		<ee:transform doc:name="Transform Message" doc:id="654c9471-b9e3-45f9-beb1-1e51fba238b8" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	codigo:payload.codigo
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="5fd91b01-fc2c-4cf3-8663-b2c05f554c1a" >
+			<when expression="#[payload.codigo==1]">
+				<parse-template doc:name="Parse Template" doc:id="bcb4477b-309f-4f93-a320-b6f2afa891e4" location="respuesta.html"/>
+			</when>
+			<otherwise >
+				<parse-template doc:name="Parse Template" doc:id="5fd04c43-cb24-491d-a01e-162577214a55" location="fallido.html"/>
+			</otherwise>
+		</choice>
 	</flow>
 </mule>
