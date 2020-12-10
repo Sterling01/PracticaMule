@@ -214,25 +214,57 @@ output application/json
 	datos_detalle:{
 		cantidad:1,
 		titulo:payload.pelicula.titulo,
-		precio:payload.pelicula.precio
+		precio:payload.pelicula.precio,
+		genero:payload.pelicula.genero
 	}
 }]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
-				<http:request method="POST" doc:name="Request" doc:id="8651dfbe-d8bf-455d-a996-40177cf7ed81" config-ref="HTTP_Request_configuration1" path="Facturacion/rs/facturacion/guardarFactura">
-				</http:request>
-				<choice doc:name="Choice" doc:id="814e53c9-3777-4057-bcb7-3369e6a2d490" >
-					<when expression="payload.codigo==1">
-						<parse-template doc:name="Parse Template" doc:id="8e388b1b-7aaa-4a51-a1a3-5fc0f6e11a3a" location="respuesta.html"/>
-					</when>
-					<otherwise >
-						<parse-template doc:name="Parse Template" doc:id="7dfe5a23-d6b9-486a-b7cb-48103761b031" location="fallido.html"/>
-					</otherwise>
-				</choice>
+				<parse-template doc:name="Parse Template" doc:id="e8e525d0-b2ff-4b4a-9341-a22dd10dceaf" location="personaPeliculaPago.html"/>
 			</when>
 			<otherwise >
-				<parse-template doc:name="Parse Template" doc:id="aea770be-64f9-4cd5-a66e-97f3b27760c4" location="personaPelicula.html" />
+				<parse-template doc:name="Parse Template" doc:id="aea770be-64f9-4cd5-a66e-97f3b27760c4" location="formPersona.html" />
 			</otherwise>
 		</choice>
+	</flow>
+	<flow name="invokerestFlow9" doc:id="5bf01da8-fdc7-4904-bb54-7aa2227e6cac" >
+		<http:listener doc:name="Listener" doc:id="33a039c0-f666-4857-ad12-ff7f324ece1d" config-ref="HTTP_Listener_config" path="/pago"/>
+		<set-variable value="#[{
+	cedula:attributes.queryParams.'cedula',
+	nombre: attributes.queryParams.'name',
+	direccion: attributes.queryParams.'direccion',
+	telefono: attributes.queryParams.'telefono',
+	nombrePeli: attributes.queryParams.'pname',
+	precio: attributes.queryParams.'precio'
+}]" doc:name="Set Variable" doc:id="758e1152-e10c-4dbf-b434-61c0eccf9d8c" variableName="Pago"/>
+		<ee:transform doc:name="Transform Message" doc:id="26fd187e-9174-4321-92df-baa184c3749f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	cedula:vars.Pago.cedula,
+	nombre: vars.Pago.nombre,
+	telefono: vars.Pago.telefono,
+	direccion: vars.Pago.direccion,
+	datos_detalle:{
+		cantidad:1,
+		titulo:vars.Pago.nombrePeli,
+		precio:vars.Pago.precio
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="f293db77-f489-403a-86a3-2af2067e7314" message="#[payload]"/>
+		<http:request method="POST" doc:name="Request" doc:id="8651dfbe-d8bf-455d-a996-40177cf7ed81" config-ref="HTTP_Request_configuration1" path="Facturacion/rs/facturacion/guardarFactura">
+				</http:request>
+		<choice doc:name="Choice" doc:id="814e53c9-3777-4057-bcb7-3369e6a2d490">
+					<when expression="payload.codigo==1">
+						<parse-template doc:name="Parse Template" doc:id="8e388b1b-7aaa-4a51-a1a3-5fc0f6e11a3a" location="respuesta.html" />
+					</when>
+					<otherwise>
+						<parse-template doc:name="Parse Template" doc:id="7dfe5a23-d6b9-486a-b7cb-48103761b031" location="fallido.html" />
+					</otherwise>
+				</choice>
 	</flow>
 </mule>
