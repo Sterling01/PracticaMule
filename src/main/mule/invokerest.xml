@@ -24,7 +24,7 @@ http://www.mulesoft.org/schema/mule/netsuite http://www.mulesoft.org/schema/mule
 	</flow>
 	<flow name="invokerestFlow1" doc:id="70f4c498-316f-4201-b344-a69e5c78b2be" >
 		<http:listener doc:name="Listener" doc:id="29472bdd-08b1-4699-a39b-5b594f27f23a" config-ref="HTTP_Listener_config" path="/form"/>
-		<parse-template doc:name="Parse Template" doc:id="f386b46d-1e69-484a-b27e-6ab15044938c" location="fomr.html"/>
+		<parse-template doc:name="Parse Template" doc:id="f386b46d-1e69-484a-b27e-6ab15044938c" location="form.html"/>
 	</flow>
 	<flow name="invokerestFlow2" doc:id="247a9952-06ac-4c35-acf2-c485ad18e70c" >
 		<http:listener doc:name="Listener" doc:id="6964ee2a-b569-4163-99b2-bb89ef581ac7" config-ref="HTTP_Listener_config" path="/response"/>
@@ -143,6 +143,95 @@ output application/java
 			</when>
 			<otherwise >
 				<parse-template doc:name="Parse Template" doc:id="5fd04c43-cb24-491d-a01e-162577214a55" location="fallido.html"/>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="invokerestFlow6" doc:id="95ace548-4c7f-4bb3-a18b-b58046d87351" >
+		<http:listener doc:name="Listener" doc:id="7dde5bf0-bac6-4649-a3f1-7009d01c6430" config-ref="HTTP_Listener_config" path="/inicio"/>
+		<parse-template doc:name="Parse Template" doc:id="3ba1dab6-5064-4f0a-8a5b-4815e0fe39c1" location="formPersona.html"/>
+	</flow>
+	<flow name="invokerestFlow7" doc:id="7c974ebf-9898-4e84-b553-306587db75a6" >
+		<http:listener doc:name="Listener" doc:id="1d579b37-be0b-48cd-ab2a-ddefcc9059cd" config-ref="HTTP_Listener_config" path="/persona"/>
+		<http:request method="GET" doc:name="Request" doc:id="5f0e8bc6-892a-4aee-a670-5e94950ff0e2" config-ref="HTTP_Request_configuration1" path="Registro_Civil/rs/usuario/datos">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	f : attributes.queryParams.'fname'
+}]]]></http:query-params>
+		</http:request>
+		<choice doc:name="Choice" doc:id="c29ffe5c-7b04-4672-802f-29f63f6729a6" >
+			<when expression="#[payload.codigo==1]">
+				<ee:transform doc:name="Transform Message" doc:id="ec2bc2eb-7129-449f-b2c5-a7562df2465b">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	codigo: payload.codigo,
+	persona:{
+		cedula:payload.usuario.cedula,
+		nombre: payload.usuario.nombre ++" "++ payload.usuario.apellido,
+		telefono: payload.usuario.telefono,
+		direccion: payload.usuario.principal ++" "++ payload.usuario.secundaria
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+				<parse-template doc:name="Parse Template" doc:id="a8eaa193-ac35-4742-8882-efca14837161" location="personaPelicula.html" />
+			</when>
+			<otherwise >
+				<parse-template doc:name="Parse Template" doc:id="1bacf561-c78d-4429-9d7f-f6c3c0e6f5c6" location="formPersona.html"/>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="invokerestFlow8" doc:id="ae97a094-7be7-48b3-8598-c786b1558d22" >
+		<http:listener doc:name="Listener" doc:id="afb025aa-db98-4983-9af3-308bdec9fb97" config-ref="HTTP_Listener_config" path="/pelicula"/>
+		<set-variable value="#[{
+	cedula:attributes.queryParams.'cedula',
+	nombre: attributes.queryParams.'name',
+	direccion: attributes.queryParams.'direccion',
+	telefono: attributes.queryParams.'telefono'
+}]" doc:name="Set Variable" doc:id="88a79358-0eb3-40e9-8a74-94bc7e1d549e" variableName="Persona"/>
+		<http:request method="GET" doc:name="Request" doc:id="c7a98243-c2ce-4f47-a1d6-bb61b9235926" config-ref="HTTP_Request_configuration1" path="Peliculas/rs/pelicula/datos">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	f : attributes.queryParams.'pname'
+}]]]></http:query-params>
+		</http:request>
+		<choice doc:name="Choice" doc:id="93511daf-8d3f-4ce6-a0da-8c7b07a3ad31" >
+			<when expression="#[payload.codigo==1]">
+				<ee:transform doc:name="Transform Message" doc:id="cd38293c-b3d6-4db3-9539-7bc9e225bf99" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	cedula:vars.Persona.cedula,
+	nombre: vars.Persona.nombre,
+	telefono: vars.Persona.telefono,
+	direccion: vars.Persona.direccion,
+	datos_detalle:{
+		cantidad:1,
+		titulo:payload.pelicula.titulo,
+		precio:payload.pelicula.precio
+	}
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<http:request method="POST" doc:name="Request" doc:id="8651dfbe-d8bf-455d-a996-40177cf7ed81" config-ref="HTTP_Request_configuration1" path="Facturacion/rs/facturacion/guardarFactura">
+				</http:request>
+				<choice doc:name="Choice" doc:id="814e53c9-3777-4057-bcb7-3369e6a2d490" >
+					<when expression="payload.codigo==1">
+						<parse-template doc:name="Parse Template" doc:id="8e388b1b-7aaa-4a51-a1a3-5fc0f6e11a3a" location="respuesta.html"/>
+					</when>
+					<otherwise >
+						<parse-template doc:name="Parse Template" doc:id="7dfe5a23-d6b9-486a-b7cb-48103761b031" location="fallido.html"/>
+					</otherwise>
+				</choice>
+			</when>
+			<otherwise >
+				<parse-template doc:name="Parse Template" doc:id="aea770be-64f9-4cd5-a66e-97f3b27760c4" location="personaPelicula.html" />
 			</otherwise>
 		</choice>
 	</flow>

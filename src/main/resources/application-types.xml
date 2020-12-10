@@ -5,19 +5,23 @@
       <types:shape format="weave" example="examples/persona.json"><![CDATA[%dw 2.0
 
 type persona = {|
-  apellido: String, 
-  cedula: String, 
-  ciudad: String, 
-  educacion: String, 
-  estado: String, 
-  estado_usuario: String, 
-  fecha_nacimiento: String, 
-  genero: String, 
-  nombre: String, 
-  principal: String, 
-  secundaria: String, 
-  telefono: String
-|} {"example": "{\\\"apellido\\\":\\\"Vazquez\\\",\\\"cedula\\\":\\\"1401277767\\\",\\\"ciudad\\\":\\\"Cuenca\\\",\\\"educacion\\\":\\\"Secundario\\\",\\\"estado\\\":\\\"Divorciado\\\",\\\"estado_usuario\\\":\\\"Habilitado\\\",\\\"fecha_nacimiento\\\":\\\"1990-11-30\\\",\\\"genero\\\":\\\"Masculino\\\",\\\"nombre\\\":\\\"Javier\\\",\\\"principal\\\":\\\"Casique Duma\\\",\\\"secundaria\\\":\\\"Calle del retorno 1\\\",\\\"telefono\\\":\\\"072808388\\\"}"}
+  codigo: Number {"typeId": "int"}, 
+  mensaje: String, 
+  usuario: {|
+    apellido: String, 
+    cedula: String, 
+    ciudad: String, 
+    educacion: String, 
+    estado: String, 
+    estado_usuario: String, 
+    fecha_nacimiento: String, 
+    genero: String, 
+    nombre: String, 
+    principal: String, 
+    secundaria: String, 
+    telefono: String
+  |}
+|} {"example": "{\\\"codigo\\\":1,\\\"mensaje\\\":\\\"Ok\\\",\\\"usuario\\\":{\\\"apellido\\\":\\\"Figueroa\\\",\\\"cedula\\\":\\\"0107349110\\\",\\\"ciudad\\\":\\\"Cuenca\\\",\\\"educacion\\\":\\\"Primario\\\",\\\"estado\\\":\\\"Soltero\\\",\\\"estado_usuario\\\":\\\"Habilitado\\\",\\\"fecha_nacimiento\\\":\\\"1998-05-04\\\",\\\"genero\\\":\\\"Masculino\\\",\\\"nombre\\\":\\\"Stalin\\\",\\\"principal\\\":\\\"Tarqui y Cuenca\\\",\\\"secundaria\\\":\\\"Lumbaqui\\\",\\\"telefono\\\":\\\"0967585156\\\"}}"}
 
 ]]></types:shape>
     </types:type>
@@ -26,13 +30,17 @@ type persona = {|
 
 type pelicula = {|
   codigo: Number {"typeId": "int"}, 
-  descripcion: String, 
-  director: String, 
-  fecha_estreno: String, 
-  genero: String, 
-  precio: String, 
-  titulo: String
-|} {"example": "{\\\"codigo\\\":100,\\\"descripcion\\\":\\\"Los Vengadores restantes deben encontrar una manera de recuperar a sus aliados para un enfrentamiento \u00E9pico con Thanos, el malvado que diezm\u00F3 el planeta y el universo\\\",\\\"director\\\":\\\"Joe Russo, Anthony Russo\\\",\\\"fecha_estreno\\\":\\\"2019-04-22\\\",\\\"genero\\\":\\\"Accion\\/Ciencia Ficcion\\\",\\\"precio\\\":\\\"15.25\\\",\\\"titulo\\\":\\\"Endgame\\\"}"}
+  mensaje: String, 
+  pelicula: {|
+    codigo: Number {"typeId": "int"}, 
+    descripcion: String, 
+    director: String, 
+    fecha_estreno: String, 
+    genero: String, 
+    precio: String, 
+    titulo: String
+  |}
+|} {"example": "{\\\"codigo\\\":1,\\\"mensaje\\\":\\\"ok\\\",\\\"pelicula\\\":{\\\"codigo\\\":100,\\\"descripcion\\\":\\\"Los Vengadores restantes deben encontrar una manera de recuperar a sus aliados para un enfrentamiento \u00E9pico con Thanos, el malvado que diezm\u00F3 el planeta y el universo\\\",\\\"director\\\":\\\"Joe Russo, Anthony Russo\\\",\\\"fecha_estreno\\\":\\\"2019-04-22\\\",\\\"genero\\\":\\\"Accion\\/Ciencia Ficcion\\\",\\\"precio\\\":\\\"15.25\\\",\\\"titulo\\\":\\\"Endgame\\\"}}"}
 
 ]]></types:shape>
     </types:type>
@@ -46,13 +54,17 @@ type respuesta = {|
 
 ]]></types:shape>
     </types:type>
+    <types:type name="nombre" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
   </types:catalog>
   <types:enrichment select="#f869380c-7c2d-4fe5-9018-5806eda22371">
     <types:processor-declaration>
       <types:input-event>
         <types:variables>
-          <types:variable name="persona" type="persona"/>
           <types:variable name="pelicula" type="pelicula"/>
+          <types:variable name="persona" type="persona"/>
         </types:variables>
       </types:input-event>
     </types:processor-declaration>
@@ -62,6 +74,24 @@ type respuesta = {|
       <types:input-event>
         <types:variables>
           <types:variable name="respuesta" type="respuesta"/>
+        </types:variables>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#ec2bc2eb-7129-449f-b2c5-a7562df2465b">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:variables>
+          <types:variable name="persona" type="persona"/>
+        </types:variables>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#cd38293c-b3d6-4db3-9539-7bc9e225bf99">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:variables>
+          <types:variable name="pelicula" type="pelicula"/>
         </types:variables>
       </types:input-event>
     </types:processor-declaration>

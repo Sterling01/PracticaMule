@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    
+body {
+    background-image:url("D:\stali\Documents\AnypointStudio\invokerest\src\main\resources\fondo.jpg");
+}
+    
+label{
+    font-family: sans-serif
+}
+
+p{
+  font-family: sans-serif
+}
+
+label{
+font-weight: bold;
+}
+
+input[type=number], select {
+  width: 80%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+input[type=text], select {
+  width: 80%;
+  padding: 12px 20px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+input[type=submit] {
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+.titulo {
+    width: 100%;
+    text-align: center;
+    font-family: sans-serif;
+    margin-top: 25%;
+    height: 60%;
+}
+
+.container {
+}
+
+.child {
+  width: 80%;
+  height: 60%;
+  /* Center vertically and horizontally */
+  top: 50%;
+  margin: 20px 0 0 75px; /* apply negative top and left margins to truly center the element */
+}
+    
+.bg{
+    background-color: white;
+    width: 50%;
+    margin-left: 25%;
+    height: 60%;
+    border-radius: 25px;
+}
+</style>
+</head>
+<body>
+<div class="bg">
+<div class="titulo">
+<h2>Pagar por una pel&iacutecula</h2>
+</div>
+<div class="container">
+<div class="child">
+<form action="http://localhost:8081/pelicula">
+	<label for="fname"> Informaci&oacuten Persona: </label><br>
+	<p>C&eacutedula: <input type="text" id="cedula" name="cedula" value=#[payload.persona.cedula]></p>
+	<p>Nombre: <input type="text" id="name" name="name" value=#[payload.persona.nombre]></p>
+	<p>Direcci&oacuten: <input type="text" id="direccion" name="direccion" value=#[payload.persona.direccion]></p>
+	<p>Tel&eacutefono: <input type="text" id="telefono" name="telefono" value=#[payload.persona.telefono]></p><br>
+	<label for="pname"> Nombre de la Pelicula: </label><br>
+	<input type="text" id="pname" name="pname"><br>
+	<input type="submit" value="Aceptar">
+    </form>
+    </div>
+</div>
+</div>
+
+</body>
+</html>
